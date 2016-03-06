@@ -1,6 +1,6 @@
 # AlphaHex
 
-Not really.  I enjoyed learning about [AlphaGo](https://deepmind.com/alpha-go.html), so I decided to try building a simple move predictor for my favorite game, [Hex](https://en.wikipedia.org/wiki/Hex_(board_game)).
+I enjoyed learning about [AlphaGo](https://deepmind.com/alpha-go.html), so I decided to try building a simple move predictor for my favorite game, [Hex](https://en.wikipedia.org/wiki/Hex_(board_game)).
 
 I decided to use [Apache Spark](http://spark.apache.org/) because I have some experience with it and the Spark [machine learning libraries](http://spark.apache.org/docs/latest/mllib-guide.html) are pretty dead-simple to use.
 
