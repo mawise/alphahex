@@ -18,13 +18,14 @@ import java.util.List;
 public class BuildPredictor {
     public static void main(String[] args) {
 
+        long startTime = System.currentTimeMillis();
         SparkConf conf = new SparkConf()
                 .setAppName("BuildHexPredictor")
                 .setMaster("local[*]");
         SparkContext sc = new SparkContext(conf);
         //JavaSparkContext jsc = new JavaSparkContext(conf);
 
-        String score = "1500";
+        String score = "1700";
         String dbfile = "/Users/matt/Documents/hex/"+score+"moves.csv";
         String modelOutput = "/Users/matt/Documents/hex/"+score+"model";
 
@@ -58,6 +59,7 @@ public class BuildPredictor {
         System.out.println("Precision = " + precision);
         model.save(sc, modelOutput);
 
+        System.out.println("Elapsed seconds: " + (System.currentTimeMillis() - startTime)/1000);
     }
 
     public static List<LabeledPoint> movesFromGame(String movelist){
@@ -67,10 +69,15 @@ public class BuildPredictor {
         for (String m : movelist.split(",")){
             if (m.equals("SWAP")){
                 out.add(new LabeledPoint(HexBoard.SWAP_INDEX, board.toVector()));
+                out.add(new LabeledPoint(HexBoard.SWAP_INDEX, board.rotate().toVector()));
+
             } else {
                 out.add(new LabeledPoint(
                         Integer.parseInt(HexBoard.indexOfMoveForPlayerOne(m, player)),
                         board.withPlayerOneToMove(player).toVector()));
+                out.add(new LabeledPoint(
+                        Integer.parseInt(HexBoard.indexOfMoveForPlayerOne(m, player)),
+                        board.rotate().withPlayerOneToMove(player).toVector()));
                 board.addMove(m, player);
                 player = HexBoard.otherPlayer(player);
             }

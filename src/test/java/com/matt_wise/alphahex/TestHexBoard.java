@@ -23,8 +23,6 @@ public class TestHexBoard {
         serialized = b.toSparseLibSvmVector();
         Assert.assertEquals(serialized, "0:1 1:-1");
         Assert.assertFalse(b.isEmpty());
-
-        b.printBoard();
     }
 
     @Test
@@ -66,5 +64,13 @@ public class TestHexBoard {
         moveFromIndex = HexBoard.indexToMove(Integer.parseInt(index));
 
         Assert.assertEquals(moveFromIndex, move);
+    }
+
+    @Test
+    public void testRotateBoard(){
+        HexBoard board = new HexBoard();
+        board.addMove("C1", HexBoard.RED);
+        HexBoard rotated = board.rotate();
+        //TODO: fill this in.
     }
 }

@@ -104,6 +104,24 @@ public class HexBoard {
         }
     }
 
+    public HexBoard rotate(){
+        byte[][] newBoard = new byte[n][n];
+        for (int i=0; i<n; i++){
+            newBoard[i] = board[n-(i+1)].clone();
+            reverseArray(newBoard[i]);
+        }
+        return new HexBoard(newBoard, isEmpty);
+    }
+
+    public static void reverseArray(byte[] array){
+        for(int i = 0; i < array.length / 2; i++)
+        {
+            byte temp = array[i];
+            array[i] = array[array.length - i - 1];
+            array[array.length - i - 1] = temp;
+        }
+    }
+
     public byte[] serialize(){
         byte[] output = new byte[n*n];
         for (int i=0; i<n; i++){
