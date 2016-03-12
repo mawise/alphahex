@@ -5,8 +5,10 @@ repositories {
     mavenCentral()
 }
 dependencies {
-    compile 'org.apache.spark:spark-core_2.10:1.6.0'
-    compile 'org.apache.spark:spark-mllib_2.10:1.6.0'
+    compile 'org.apache.spark:spark-core_2.10:1.6.1'
+    compile 'org.apache.spark:spark-sql_2.10:1.6.1'
+    compile 'org.apache.spark:spark-mllib_2.10:1.6.1'
+
     compile 'org.xerial:sqlite-jdbc:3.8.11.2'
 
     testCompile 'org.testng:testng:6.9.10'
