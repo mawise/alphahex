@@ -7,7 +7,8 @@ import org.apache.spark.mllib.classification.LogisticRegressionModel;
 import java.util.Scanner;
 
 /**
- * Created by matt on 3/6/16.
+ * This leverages the first predictor, all relavent code has been moved
+ * to the MultiLayerPredictor classes.
  */
 public class UsePredictor {
     public static void main(String args[]){

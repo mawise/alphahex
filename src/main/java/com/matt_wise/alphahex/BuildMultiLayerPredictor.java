@@ -4,12 +4,15 @@ import org.apache.spark.SparkConf;
 import org.apache.spark.SparkContext;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
+import org.apache.spark.ml.ann.FeedForwardTopology;
+import org.apache.spark.ml.ann.TopologyModel;
 import org.apache.spark.ml.classification.MultilayerPerceptronClassificationModel;
 import org.apache.spark.ml.classification.MultilayerPerceptronClassifier;
 import org.apache.spark.ml.evaluation.MulticlassClassificationEvaluator;
 import org.apache.spark.mllib.classification.LogisticRegressionModel;
 import org.apache.spark.mllib.classification.LogisticRegressionWithLBFGS;
 import org.apache.spark.mllib.evaluation.MulticlassMetrics;
+import org.apache.spark.mllib.linalg.Vector;
 import org.apache.spark.mllib.regression.LabeledPoint;
 import org.apache.spark.sql.DataFrame;
 import org.apache.spark.sql.SQLContext;
@@ -31,7 +34,7 @@ public class BuildMultiLayerPredictor {
                 .setAppName("BuildHexPredictor");
         try {
             conf.get("spark.master");
-        } catch (NoSuchElementException e){
+        } catch (NoSuchElementException e) {
             System.err.println("WARN: spark.master not set, using local");
             conf.setMaster("local[*]");
         }
@@ -40,10 +43,11 @@ public class BuildMultiLayerPredictor {
         SQLContext sql = new org.apache.spark.sql.SQLContext(jsc);
 
         List<String> numberOutput = new ArrayList<>();
-        int[] iterations = {300};
-        int[] layerSize = {150};
+        int iterations = 300;
+        int layerSize = 150;
         String score = "1700";
-        String dbfile = "/Users/matt/Documents/hex/"+score+"moves.csv";
+        String dbfile = "/Users/matt/Documents/hex/" + score + "moves.csv";
+        String saveModelPath = "/Users/matt/Documents/hex/" + score + "Topology.model";
 
         JavaRDD<LabeledPoint> dataRDD = jsc.textFile(dbfile)
                 .flatMap(BuildMultiLayerPredictor::movesFromGame);
@@ -51,38 +55,42 @@ public class BuildMultiLayerPredictor {
         DataFrame dataFrame = sql.createDataFrame(dataRDD, LabeledPoint.class);
 
 // Split the data into train and test
-        DataFrame[] splits = dataFrame.randomSplit(new double[]{0.8, 0.2}, 1234L);
+        DataFrame[] splits = dataFrame.randomSplit(new double[]{0.99, 0.01}, 1234L);
         DataFrame train = splits[0];
         DataFrame test = splits[1];
 
-        for (int i : iterations) {
-            for (int l : layerSize) {
 
-                long startTime = System.currentTimeMillis();
+        long startTime = System.currentTimeMillis();
 
-                MultilayerPerceptronClassificationModel model = doTraining(train, l, i, jsc, sql);
+        MultilayerPerceptronClassificationModel model = doTraining(train, layerSize, iterations, jsc, sql);
 
-                // compute precision on the test set
-                DataFrame result = model.transform(test);
-                DataFrame predictionAndLabels = result.select("prediction", "label");
-                MulticlassClassificationEvaluator evaluator = new MulticlassClassificationEvaluator()
-                        .setMetricName("precision");
-                double precision = evaluator.evaluate(predictionAndLabels);
-                // $example off
-                numberOutput.add("minscore: " + score +
-                        ", iterations: " + i +
-                        ", layers: " + l +
-                        ", precision: " + precision +
-                        ", time: " + (System.currentTimeMillis() - startTime));
-            }
-        }
+        SuperMLPC savableModel = new SuperMLPC(model);
+        savableModel.saveToDisk(saveModelPath);
+
+        // compute precision on the test set
+        DataFrame result = model.transform(test);
+        DataFrame predictionAndLabels = result.select("prediction", "label");
+        MulticlassClassificationEvaluator evaluator = new MulticlassClassificationEvaluator()
+                .setMetricName("precision");
+        double precision = evaluator.evaluate(predictionAndLabels);
+        // $example off
+        numberOutput.add("minscore: " + score +
+                ", iterations: " + iterations +
+                ", layers: " + layerSize +
+                ", precision: " + precision +
+                ", time: " + (System.currentTimeMillis() - startTime));
+
         jsc.stop();
 
-        for (String out : numberOutput){
+        for (String out : numberOutput) {
             System.out.println(out);
         }
     }
 
+    public void saveMLPC(MultilayerPerceptronClassificationModel model, String path){
+        int[] layers = model.layers();
+        Vector weights = model.weights();
+    }
 
     public static MultilayerPerceptronClassificationModel doTraining(
             DataFrame train,
@@ -106,7 +114,6 @@ public class BuildMultiLayerPredictor {
         return model;
 
     }
-
 
     public static List<LabeledPoint> movesFromGame(String movelist){
         HexBoard board = new HexBoard();

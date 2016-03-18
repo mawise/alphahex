@@ -13,7 +13,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by matt on 3/6/16.
+ * This file builds the first predictor I made
+ * It is very much outpreformed by the MultiLayerPredictor
+ * This file will eventually be removed
  */
 public class BuildPredictor {
     public static void main(String[] args) {
