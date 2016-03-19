@@ -6,6 +6,8 @@ import org.apache.spark.ml.classification.MultilayerPerceptronClassificationMode
 import org.apache.spark.mllib.linalg.Vector;
 
 import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * This class is a sloppy wrapper around the MultiLayerPerceptronClassificationModel
@@ -61,5 +63,7 @@ public class SuperMLPC implements Serializable{
         }
         return best;
     }
+
+
 
 }

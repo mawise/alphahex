@@ -13,6 +13,8 @@ import org.apache.spark.mllib.regression.LabeledPoint;
 import org.apache.spark.sql.DataFrame;
 import org.apache.spark.sql.SQLContext;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
 
@@ -51,13 +53,26 @@ public class UseMultiLayerPredictor {
             board.addMove(inputmove, HexBoard.PLAYER_TWO);
 
             //Computer's turn
-            double moveIndex = SuperMLPC.decodePredictionVector(model.predict(board.toVector()));
+            double moveIndex = getLegalMove(model.predict(board.toVector()), board);
             String move = HexBoard.indexToMove(moveIndex);
             board.addMove(move, HexBoard.PLAYER_ONE);
             System.out.println("Computer moved at: " + move);
         }
 
 
+    }
+
+    //TODO: find an algorithm that is better than O(n*m)
+    public static int getLegalMove(Vector prediction, HexBoard board){
+        double[] vector = prediction.toArray();
+        int best = 0;
+        for (int j=0; j<vector.length; j++){
+            String move = HexBoard.indexToMove(j);
+            if ((vector[j] > vector[best]) && board.isEmptyAt(move)){
+                best = j;
+            }
+        }
+        return best;
     }
 
 

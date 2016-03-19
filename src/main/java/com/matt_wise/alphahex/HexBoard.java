@@ -84,10 +84,25 @@ public class HexBoard {
      */
 
     public void addMove(String move, byte player) {
+        if (isEmptyAt(move)) {
+            String col = move.substring(0, 1);
+            String row = move.substring(1, move.length());
+            board[coordToIndex.get(row)][coordToIndex.get(col)] = player;
+            isEmpty = false;
+        } else {
+            throw new IllegalArgumentException("Cannot play there");
+        }
+    }
+
+    public int getMove(String move){
         String col = move.substring(0, 1);
         String row = move.substring(1, move.length());
-        board[coordToIndex.get(row)][coordToIndex.get(col)] = player;
-        isEmpty = false;
+        int player = board[coordToIndex.get(row)][coordToIndex.get(col)];
+        return player;
+    }
+
+    public boolean isEmptyAt(String move){
+        return getMove(move)==0;
     }
 
     public HexBoard withPlayerOneToMove(byte currentPlayerToMove){
