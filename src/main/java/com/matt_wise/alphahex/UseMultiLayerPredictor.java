@@ -23,11 +23,10 @@ import java.util.Scanner;
  */
 public class UseMultiLayerPredictor {
     public static void main(String args[]){
-        String score = "1700";
-        String saveModelPath = "/Users/matt/Documents/hex/" + score + "Topology.model";
+        String modelPath = "src/main/resources/supermlpc.serialized";
         boolean computerGoesFirst = true;
 
-        TopologyModel model = SuperMLPC.loadFromDisk(saveModelPath).getTopoModel();
+        TopologyModel model = SuperMLPC.loadFromDisk(modelPath).getTopoModel();
 
         HexBoard board = new HexBoard();
         boolean play = true;
@@ -39,7 +38,6 @@ public class UseMultiLayerPredictor {
             String move = HexBoard.indexToMove(moveIndex);
             board.addMove(move, HexBoard.PLAYER_ONE);
         }
-
 
         while (play){
             board.printBoard();
@@ -62,7 +60,6 @@ public class UseMultiLayerPredictor {
 
     }
 
-    //TODO: find an algorithm that is better than O(n*m)
     public static int getLegalMove(Vector prediction, HexBoard board){
         double[] vector = prediction.toArray();
         int best = 0;
